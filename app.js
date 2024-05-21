@@ -1,5 +1,3 @@
-// app.js
-
 const express = require('express');
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
@@ -8,9 +6,30 @@ const path = require('path');
 // const methodOverride = require('method-override');
 // app.use(methodOverride('_method'));
 const axios = require('axios');
+const { MongoClient } = require('mongodb');
+const dotenv = require('dotenv');
+dotenv.config();
 
 const app = express();
-const port = 4000;
+// const port = 3000;
+const port = process.env.PORT || 3000;
+const mongoUrl = process.env.MONGODB_CONNECT_URL;
+
+
+let db;
+
+MongoClient.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(client => {
+    console.log('Connected to MongoDB');
+    db = client.db('bookdistribution'); // Name of your database
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
+  })
+  .catch(err => {
+    console.error('Error connecting to MongoDB', err);
+  });
+
 
 app.use(bodyParser.json());
 
@@ -22,20 +41,20 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // MySQL Database Connection
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'bookdistribution',
-});
+// db = mysql.createConnection({
+//   host: 'localhost',
+//   user: 'root',
+//   password: '',
+//   database: 'bookdistribution',
+// });
 
-db.connect((err) => {
-  if (err) {
-    console.error('Error connecting to MySQL database: ', err);
-  } else {
-    console.log('Connected to MySQL database');
-  }
-});
+// db.connect((err) => {
+//   if (err) {
+//     console.error('Error connecting to MySQL database: ', err);
+//   } else {
+//     console.log('Connected to MySQL database');
+//   }
+// });
 
 
 // landing page load
